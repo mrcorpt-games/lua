@@ -1412,6 +1412,9 @@ local function handleKeylessSkip()
     task.wait(0.3)
     if Nexo.Callbacks.OnSuccess then Nexo.Callbacks.OnSuccess() end
 end
+if Internal.Nxuzi then
+    Internal.Nxuzi.load_script()
+end
 
 local function BuildCenteredUI(windowWidth, windowHeight, panelHeight, userPanelWidth, changelogPanelWidth, gap, buildContent)
     local gui = buildContent.gui
