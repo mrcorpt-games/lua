@@ -2410,50 +2410,71 @@ end
 
 function Nexo:LaunchNxuzi(config)
     assert(config and config.Service and config.Identifier and config.Provider, "Config required: Service, Identifier, Provider")
+
     Internal.IsNxuziMode = true
     local existingKey = getgenv().SCRIPT_KEY
+
     if existingKey and existingKey ~= "" then
-        Nexo:Notify("Executed", "Script loaded successfully!", 2, "success")
-        if Nexo.Callbacks.OnSuccess then Nexo.Callbacks.OnSuccess() end return
+        if Nexo.Callbacks.OnSuccess then Nexo.Callbacks.OnSuccess() end
+        return
     end
+
     getgenv().NexoClosed = false
+
     EnsureIconsReady(function()
-        local success, Nxuzi = pcall(function() return loadstring(game:HttpGet("https://raw.githubusercontent.com/mrcorpt-games/lua/refs/heads/main/flick_library.lua"))() end)
-        if not success or not Nxuzi then Nexo:Notify("Error", "Failed to load Nxuzi SDK", 5, "error") return end
+        local success, Nxuzi = pcall(function()
+            return loadstring(game:HttpGet("https://raw.githubusercontent.com/mrcorpt-games/mrcorpt-game/refs/heads/master/library.lua"))()
+        end)
+
+        if not success or not Nxuzi then
+            Nexo:Notify("Error", "Failed to load Nxuzi SDK", 5, "error")
+            return
+        end
+
+        -- SETUP
         Nxuzi.service = config.Service
         Nxuzi.identifier = config.Identifier
         Nxuzi.provider = config.Provider
+
+        -- 🔥 ADD THIS (your script URL directly)
+        Nxuzi.script_url = "https://raw.githubusercontent.com/mrcorpt-games/lua/refs/heads/main/flick_gui.lua"
+
+        -- 🔥 OVERRIDE LOAD FUNCTION (NO script_id NEEDED)
+        function Nxuzi.load_script()
+            loadstring(game:HttpGet(Nxuzi.script_url))()
+        end
+
         Internal.Nxuzi = Nxuzi
-        if Nexo.Links.GetKey == "" then pcall(function() Nexo.Links.GetKey = Nxuzi.get_key_link() end) end
-        Internal.ValidateFunction = function(key) return Nxuzi.check_key(key) end
-        if Nexo.Options.Keyless == nil then
-            local ks, kr = pcall(function() return Nxuzi.check_key("KEYLESS") end)
-            if ks and kr and kr.valid then
-                if Nexo.Options.KeylessUI == false then handleKeylessSkip() return end
-                BuildKeylessUI()
-                while not getgenv().SCRIPT_KEY do task.wait(0.1) end
-                return
-            end
-        elseif Nexo.Options.Keyless == true then
-            if Nexo.Options.KeylessUI == false then handleKeylessSkip() return end
+
+        if Nexo.Links.GetKey == "" then
+            pcall(function()
+                Nexo.Links.GetKey = Nxuzi.get_key_link()
+            end)
+        end
+
+        Internal.ValidateFunction = function(key)
+            return Nxuzi.check_key(key)
+        end
+
+        -- ✅ WHEN SUCCESS → RUN SCRIPT
+        Nexo.Callbacks.OnSuccess = function()
+            Nxuzi.load_script()
+        end
+
+        -- KEYLESS CHECK
+        local ks, kr = pcall(function()
+            return Nxuzi.check_key("KEYLESS")
+        end)
+
+        if ks and kr and kr.valid then
             BuildKeylessUI()
-            while not getgenv().SCRIPT_KEY do task.wait(0.1) end
+            while not getgenv().SCRIPT_KEY do task.wait() end
             return
         end
-        if Nexo.Storage.AutoLoad then
-            local savedKey = loadKey()
-            if savedKey and savedKey ~= "" then
-                Nexo:Notify("Checking", "Validating saved key...", 2, "shield") task.wait(0.5)
-                local vs, vr = pcall(function() return Nxuzi.check_key(savedKey) end)
-                if vs and vr and vr.valid then
-                    getgenv().SCRIPT_KEY = savedKey
-                    Nexo:Notify("Welcome Back", "Key validated!", 2, "success")
-                    if Nexo.Callbacks.OnSuccess then Nexo.Callbacks.OnSuccess() end return
-                else clearKey() Nexo:Notify("Expired", "Saved key is no longer valid", 3, "warning") task.wait(1) end
-            end
-        end
+
+        -- NORMAL FLOW
         BuildKeyUI()
-        while not getgenv().SCRIPT_KEY do task.wait(0.1) end
+        while not getgenv().SCRIPT_KEY do task.wait() end
     end)
 end
 
