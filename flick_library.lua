@@ -8,7 +8,7 @@ Nxuzi.base_url = "https://api.jnkie.com/api/v1/whitelist"
 Nxuzi.provider = nil
 
 -- 🔥 YOUR SCRIPT URL (CHANGE THIS IF NEEDED)
-Nxuzi.script_url = "https://raw.githubusercontent.com/mrcorpt-games/lua/main/flick_gui.lua"
+Nxuzi.script_url = "https://raw.githubusercontent.com/mrcorpt-games/lua/main/flick.lua"
 
 function Nxuzi.check_key(key)
 	if not Nxuzi.service then error("service not set") end
