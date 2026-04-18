@@ -2418,7 +2418,7 @@ function Nexo:LaunchNxuzi(config)
     end
     getgenv().NexoClosed = false
     EnsureIconsReady(function()
-        local success, Nxuzi = pcall(function() return loadstring(game:HttpGet("https://raw.githubusercontent.com/mrcorpt-games/mrcorpt-game/refs/heads/master/library.lua"))() end)
+        local success, Nxuzi = pcall(function() return loadstring(game:HttpGet("https://raw.githubusercontent.com/mrcorpt-games/lua/refs/heads/main/flick_library.lua"))() end)
         if not success or not Nxuzi then Nexo:Notify("Error", "Failed to load Nxuzi SDK", 5, "error") return end
         Nxuzi.service = config.Service
         Nxuzi.identifier = config.Identifier
