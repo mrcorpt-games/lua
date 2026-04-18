@@ -58,7 +58,7 @@ end
 
 function Junkie.load_script()
 	if not Junkie.script_id then error("script_id not set") end
-	loadstring(game:HttpGet("https://github.com/mrcorpt-games/lua/releases/download/TEST/" .. tostring(Junkie.script_id) .. ".lua"))()
+	loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/" .. tostring(Junkie.script_id) .. "/download"))()
 	return
 end
 
